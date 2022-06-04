@@ -18,6 +18,10 @@ variable "eks_cluster_name" {
   type        = string
 }
 
+variable "region" {
+  description = "The current region"
+}
+
 # variable "vpc_id" {
 #   description = "vpc id for the eks cluster"
 # }
