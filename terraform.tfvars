@@ -6,4 +6,4 @@ igw_name = "eks_igw"
 
 eks_cluster_name = "eks_cluster"
 
-region = "ca-central-1"
+region = "us-east-1"

@@ -1,12 +1,12 @@
 locals {
-  # aws_alb_ingress_controller_version      = var.aws_alb_ingress_controller_version
-  aws_alb_ingress_class         = "alb"
-  aws_vpc_id                    = var.vpc_id
-  aws_region_name               = data.aws_region.current.name
-  aws_iam_path_prefix           = var.aws_iam_path_prefix == "" ? null : var.aws_iam_path_prefix
-  service_account_name          = "aws-load-balancer-controller"
-  ALB_cluster_role_name         = "aws-load-balancer-controller"
-  ALB_cluster_role_binding_name = "aws-load-balancer-controller"
+ # aws_alb_ingress_controller_version      = var.aws_alb_ingress_controller_version
+  aws_alb_ingress_class                   = "alb"
+  aws_vpc_id                              = var.vpc_id
+  aws_region_name                         = data.aws_region.current.name
+  aws_iam_path_prefix                     = var.aws_iam_path_prefix == "" ? null : var.aws_iam_path_prefix
+  service_account_name                    = "aws-load-balancer-controller"
+  alb_cluster_role_name                   = "aws-load-balancer-controller"
+  alb_cluster_role_binding_name           = "aws-load-balancer-controller"
 }
 
 data "tls_certificate" "auth" {
@@ -23,7 +23,7 @@ data "aws_region" "current" {
   name = var.region
 }
 
-data "aws_caller_identity" "current" {} # Extracts AWS account ID
+data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "eks_oidc_assume_role" {
   count = var.k8s_cluster_type == "eks" ? 1 : 0
@@ -51,7 +51,7 @@ resource "aws_iam_role" "this" {
   description = "Permissions required by the Kubernetes AWS ALB Ingress controller to do it's job."
   path        = local.aws_iam_path_prefix
 
-  # tags = var.aws_tags
+#   tags = var.aws_tags
 
   force_detach_policies = true
 
@@ -75,7 +75,7 @@ resource "kubernetes_service_account" "this" {
   automount_service_account_token = true
   metadata {
     name      = local.service_account_name
-    namespace = var.namespace
+    namespace = var.namespace 
     annotations = {
       # This annotation is only used when running on EKS which can
       # use IAM roles for service accounts.
@@ -91,10 +91,10 @@ resource "kubernetes_service_account" "this" {
 
 resource "kubernetes_cluster_role" "this" {
   metadata {
-    name = local.ALB_cluster_role_name
+    name = "aws-load-balancer-controller"
 
     labels = {
-      "app.kubernetes.io/name"       = local.ALB_cluster_role_name
+      "app.kubernetes.io/name"       = local.alb_cluster_role_name
       "app.kubernetes.io/managed-by" = "terraform"
     }
   }
@@ -148,10 +148,10 @@ resource "kubernetes_cluster_role" "this" {
 
 resource "kubernetes_cluster_role_binding" "this" {
   metadata {
-    name = local.ALB_cluster_role_binding_name
+    name = local.alb_cluster_role_binding_name
 
     labels = {
-      "app.kubernetes.io/name"       = local.ALB_cluster_role_binding_name
+      "app.kubernetes.io/name"       = local.alb_cluster_role_binding_name
       "app.kubernetes.io/managed-by" = "terraform"
     }
   }
@@ -171,11 +171,11 @@ resource "kubernetes_cluster_role_binding" "this" {
 }
 
 resource "helm_release" "aws-load-balancer-controller" {
-  name = "aws-load-balancer-controller"
+  name       = "aws-load-balancer-controller"
 
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = var.namespace
+  namespace = var.namespace
 
   set {
     name  = "clusterName"
@@ -194,7 +194,7 @@ resource "helm_release" "aws-load-balancer-controller" {
 
   set {
     name  = "image.repository"
-    value = format("602401143452.dkr.ecr.%s.amazonaws.com/amazon/aws-load-balancer-controller", var.region)
+    value = format("602401143452.dkr.ecr.%s.amazonaws.com/amazon/aws-load-balancer-controller",var.region)
   }
 
   # set {
@@ -211,8 +211,8 @@ resource "helm_release" "aws-load-balancer-controller" {
     name  = "vpcId"
     value = var.vpc_id
   }
-  depends_on = [
-    aws_eks_fargate_profile.alem_fargate_eks
-  ]
+depends_on = [
+  aws_eks_fargate_profile.alem_fargate_eks
+]
 
 }
