@@ -18,8 +18,8 @@ terraform {
 
 #  #AWS provider details
 provider "aws" {
-  profile = "default"
-  region  = "us-east-1"
+  # profile = "default" # Commented when using Jenkins to deploy 
+  region  = var.region # "us-east-1"
 }
 
 data "aws_eks_cluster" "cluster" {
