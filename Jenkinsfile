@@ -10,23 +10,22 @@
 
 //     }
     
-//    /* environment {
+//     environment {
 //         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
 //         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-//     } */
+//     }
 
 //     stages {
         
-//            stage('Git Checkout') {
+//         stage('Git Checkout') {
 //             steps{
-//                git branch: 'main', url: 'https://github.com/Alemmor/eks-cluster'
+//                git branch: 'main', credentialsId: 'c517c57a-cff7-4b01-bdfd-9d439477b1b1', url: 'https://github.com/Alemmor/eks-cluster.git'
 //             }
 //         }
 
 //         stage('TerraformInit'){
 //             steps {
-//                 //  dir('jenkins-terraform-pipeline/ec2_pipeline/'){
-//                     sh 'terraform init -input=false'
+//                     sh 'terraform init'
 //                 }
 //         }       
  
